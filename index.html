@@ -1,0 +1,3769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<title>Mobile FPS V6.1</title>
+
+<style>
+
+/* =====================================================
+   BASIC
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+html,
+body {
+
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #87CEEB;
+
+    touch-action: none;
+
+    font-family: Arial, sans-serif;
+
+}
+
+canvas {
+
+    display: block;
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+#hud {
+
+    position: fixed;
+
+    top: 15px;
+    left: 15px;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    text-shadow:
+        2px 2px 4px black;
+
+    z-index: 20;
+
+    pointer-events: none;
+
+}
+
+#healthBar {
+
+    width: 180px;
+
+    height: 20px;
+
+    margin-top: 4px;
+
+    border: 2px solid white;
+
+    background: #333;
+
+}
+
+#health {
+
+    width: 100%;
+
+    height: 100%;
+
+    background: lime;
+
+    transition: width 0.15s;
+
+}
+
+.stat {
+
+    margin-top: 5px;
+
+}
+
+
+/* =====================================================
+   CROSSHAIR
+===================================================== */
+
+#crosshair {
+
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    color: white;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    text-shadow:
+        2px 2px 5px black;
+
+    pointer-events: none;
+
+    z-index: 10;
+
+}
+
+
+/* =====================================================
+   HIT MARKER
+===================================================== */
+
+#hitMarker {
+
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    color: white;
+
+    font-size: 35px;
+
+    font-weight: bold;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 15;
+
+}
+
+
+/* =====================================================
+   DAMAGE FLASH
+===================================================== */
+
+#damageFlash {
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(255, 0, 0, 0.3);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 14;
+
+}
+
+
+/* =====================================================
+   WAVE MESSAGE
+===================================================== */
+
+#waveMessage {
+
+    position: fixed;
+
+    top: 35%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    color: white;
+
+    font-size: 42px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    text-shadow:
+        3px 3px 8px black;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    z-index: 50;
+
+    transition:
+        opacity 0.3s;
+
+}
+
+
+/* =====================================================
+   JOYSTICK
+===================================================== */
+
+#joystick {
+
+    position: fixed;
+
+    left: 25px;
+
+    bottom: 30px;
+
+    width: 130px;
+
+    height: 130px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.2);
+
+    border:
+        3px solid
+        rgba(255, 255, 255, 0.5);
+
+    z-index: 30;
+
+    touch-action: none;
+
+}
+
+#stick {
+
+    position: absolute;
+
+    width: 50px;
+
+    height: 50px;
+
+    left: 40px;
+
+    top: 40px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.75);
+
+}
+
+
+/* =====================================================
+   FIRE BUTTON
+===================================================== */
+
+#fire {
+
+    position: fixed;
+
+    right: 25px;
+
+    bottom: 35px;
+
+    width: 90px;
+
+    height: 90px;
+
+    border-radius: 50%;
+
+    background: red;
+
+    color: white;
+
+    border:
+        3px solid white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    z-index: 30;
+
+    touch-action: none;
+
+}
+
+
+/* =====================================================
+   RELOAD BUTTON
+===================================================== */
+
+#reload {
+
+    position: fixed;
+
+    right: 35px;
+
+    bottom: 145px;
+
+    width: 80px;
+
+    height: 45px;
+
+    border-radius: 8px;
+
+    background: black;
+
+    color: white;
+
+    border:
+        2px solid white;
+
+    z-index: 30;
+
+    touch-action: none;
+
+}
+
+
+/* =====================================================
+   SPRINT BUTTON
+===================================================== */
+
+#sprint {
+
+    position: fixed;
+
+    left: 170px;
+
+    bottom: 45px;
+
+    width: 75px;
+
+    height: 55px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(0, 0, 0, 0.7);
+
+    color: white;
+
+    border:
+        2px solid white;
+
+    font-weight: bold;
+
+    z-index: 30;
+
+    touch-action: none;
+
+}
+
+
+/* =====================================================
+   WEAPON SWITCHING
+===================================================== */
+
+#weaponButtons {
+
+    position: fixed;
+
+    left: 15px;
+
+    bottom: 170px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    z-index: 30;
+
+}
+
+.weaponButton {
+
+    width: 75px;
+
+    height: 35px;
+
+    background:
+        rgba(0, 0, 0, 0.75);
+
+    color: white;
+
+    border:
+        2px solid white;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+}
+
+
+/* =====================================================
+   MINIMAP
+===================================================== */
+
+#minimap {
+
+    position: fixed;
+
+    top: 15px;
+
+    right: 15px;
+
+    width: 150px;
+
+    height: 150px;
+
+    background:
+        rgba(0, 0, 0, 0.65);
+
+    border:
+        2px solid white;
+
+    z-index: 25;
+
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+#message {
+
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    color: white;
+
+    font-size: 38px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    text-shadow:
+        3px 3px 7px black;
+
+    z-index: 100;
+
+    display: none;
+
+}
+
+#restart {
+
+    margin-top: 20px;
+
+    padding:
+        12px 25px;
+
+    background: black;
+
+    color: white;
+
+    border:
+        2px solid white;
+
+    border-radius: 8px;
+
+    font-size: 18px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HUD
+===================================================== -->
+
+<div id="hud">
+
+    HEALTH
+
+    <div id="healthBar">
+
+        <div id="health"></div>
+
+    </div>
+
+
+    <div class="stat">
+
+        WEAPON:
+
+        <span id="weaponName">
+
+            PISTOL
+
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        AMMO:
+
+        <span id="ammo">
+
+            12
+
+        </span>
+
+        /
+
+        <span id="reserve">
+
+            60
+
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        KILLS:
+
+        <span id="kills">
+
+            0
+
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        ENEMIES:
+
+        <span id="enemyCount">
+
+            0
+
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        WAVE:
+
+        <span id="wave">
+
+            1
+
+        </span>
+
+        /
+
+        <span id="maxWave">
+
+            10
+
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CROSSHAIR
+===================================================== -->
+
+<div id="crosshair">
+
+    +
+
+</div>
+
+
+<div id="hitMarker">
+
+    X
+
+</div>
+
+
+<div id="damageFlash">
+
+</div>
+
+
+<div id="waveMessage">
+
+    WAVE 1
+
+</div>
+
+
+<!-- =====================================================
+     JOYSTICK
+===================================================== -->
+
+<div id="joystick">
+
+    <div id="stick"></div>
+
+</div>
+
+
+<!-- =====================================================
+     BUTTONS
+===================================================== -->
+
+<button id="sprint">
+
+    SPRINT
+
+</button>
+
+
+<button id="fire">
+
+    FIRE
+
+</button>
+
+
+<button id="reload">
+
+    RELOAD
+
+</button>
+
+
+<!-- =====================================================
+     WEAPON BUTTONS
+===================================================== -->
+
+<div id="weaponButtons">
+
+    <button
+        class="weaponButton"
+        data-weapon="pistol"
+    >
+
+        PISTOL
+
+    </button>
+
+
+    <button
+        class="weaponButton"
+        data-weapon="smg"
+    >
+
+        SMG
+
+    </button>
+
+
+    <button
+        class="weaponButton"
+        data-weapon="assault"
+    >
+
+        AR
+
+    </button>
+
+
+    <button
+        class="weaponButton"
+        data-weapon="sniper"
+    >
+
+        SNIPER
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     MINIMAP
+===================================================== -->
+
+<canvas
+    id="minimap"
+    width="150"
+    height="150"
+></canvas>
+
+
+<!-- =====================================================
+     GAME OVER
+===================================================== -->
+
+<div id="message">
+
+    <div id="messageText">
+
+        GAME OVER
+
+    </div>
+
+
+    <button id="restart">
+
+        RESTART
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     THREE.JS
+===================================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+
+<script>
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
+
+let scene;
+
+let camera;
+
+let renderer;
+
+let player;
+
+let gun;
+
+let muzzleFlash;
+
+let enemies = [];
+
+let walls = [];
+
+let bullets = [];
+
+let health = 100;
+
+let kills = 0;
+
+let gameOver = false;
+
+let sprinting = false;
+
+let reloading = false;
+
+let lastShot = 0;
+
+
+/* =====================================================
+   MAP SIZE
+===================================================== */
+
+const MAP_SIZE = 250;
+
+const MAP_HALF = 125;
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+let joyX = 0;
+
+let joyY = 0;
+
+let joystickTouch = null;
+
+let aimTouch = null;
+
+let lastAimX = 0;
+
+let lastAimY = 0;
+
+let rotationY = 0;
+
+let rotationX = 0;
+
+
+/* =====================================================
+   WEAPON SYSTEM
+===================================================== */
+
+const weapons = {
+
+    pistol: {
+
+        name:
+            "PISTOL",
+
+        damage:
+            35,
+
+        fireRate:
+            300,
+
+        magazine:
+            12,
+
+        ammo:
+            12,
+
+        reserve:
+            60,
+
+        spread:
+            0.015,
+
+        reloadTime:
+            900
+
+    },
+
+
+    smg: {
+
+        name:
+            "SMG",
+
+        damage:
+            15,
+
+        fireRate:
+            90,
+
+        magazine:
+            30,
+
+        ammo:
+            30,
+
+        reserve:
+            120,
+
+        spread:
+            0.055,
+
+        reloadTime:
+            1100
+
+    },
+
+
+    assault: {
+
+        name:
+            "ASSAULT RIFLE",
+
+        damage:
+            28,
+
+        fireRate:
+            160,
+
+        magazine:
+            30,
+
+        ammo:
+            30,
+
+        reserve:
+            120,
+
+        spread:
+            0.025,
+
+        reloadTime:
+            1300
+
+    },
+
+
+    sniper: {
+
+        name:
+            "SNIPER",
+
+        damage:
+            150,
+
+        fireRate:
+            1000,
+
+        magazine:
+            5,
+
+        ammo:
+            5,
+
+        reserve:
+            25,
+
+        spread:
+            0.002,
+
+        reloadTime:
+            1600
+
+    }
+
+};
+
+
+let currentWeapon =
+    "pistol";
+
+
+/* =====================================================
+   WAVE VARIABLES
+===================================================== */
+
+let currentWave = 1;
+
+let waveInProgress = false;
+
+let waveEnemiesRemaining = 0;
+
+let totalWaves = 10;
+
+let spawnTimer = 0;
+
+let enemiesToSpawn = 0;
+
+let enemiesSpawned = 0;
+
+let waveDelay = 5;
+
+let waveMessageTimer = 0;
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+function startGame() {
+
+
+    scene =
+        new THREE.Scene();
+
+
+    scene.background =
+
+        new THREE.Color(
+
+            0x87CEEB
+
+        );
+
+
+    camera =
+
+        new THREE.PerspectiveCamera(
+
+            75,
+
+            window.innerWidth /
+            window.innerHeight,
+
+            0.1,
+
+            1000
+
+        );
+
+
+    renderer =
+
+        new THREE.WebGLRenderer({
+
+            antialias:
+                true
+
+        });
+
+
+    renderer.setPixelRatio(
+
+        Math.min(
+
+            window.devicePixelRatio,
+
+            2
+
+        )
+
+    );
+
+
+    renderer.setSize(
+
+        window.innerWidth,
+
+        window.innerHeight
+
+    );
+
+
+    renderer.domElement.style.position =
+        "fixed";
+
+
+    renderer.domElement.style.top =
+        "0";
+
+
+    renderer.domElement.style.left =
+        "0";
+
+
+    renderer.domElement.style.zIndex =
+        "1";
+
+
+    document.body.appendChild(
+
+        renderer.domElement
+
+    );
+
+
+    /* =================================================
+       LIGHTING
+    ================================================= */
+
+    const hemisphereLight =
+
+        new THREE.HemisphereLight(
+
+            0xffffff,
+
+            0x444444,
+
+            2
+
+        );
+
+
+    scene.add(
+
+        hemisphereLight
+
+    );
+
+
+    const directionalLight =
+
+        new THREE.DirectionalLight(
+
+            0xffffff,
+
+            1
+
+        );
+
+
+    directionalLight.position.set(
+
+        50,
+
+        100,
+
+        50
+
+    );
+
+
+    scene.add(
+
+        directionalLight
+
+    );
+
+
+    /* =================================================
+       PLAYER
+    ================================================= */
+
+    player =
+
+        new THREE.Object3D();
+
+
+    player.position.set(
+
+        0,
+
+        1.7,
+
+        100
+
+    );
+
+
+    scene.add(
+
+        player
+
+    );
+
+
+    player.add(
+
+        camera
+
+    );
+
+
+    createGround();
+
+    createMap();
+
+    createGun();
+
+    setupControls();
+
+    setupWeapons();
+
+    startWave(1);
+
+    updateHUD();
+
+    updateWaveHUD();
+
+
+    window.addEventListener(
+
+        "resize",
+
+        resize
+
+    );
+
+
+    animate();
+
+}
+
+
+/* =====================================================
+   GROUND
+===================================================== */
+
+function createGround() {
+
+
+    const geometry =
+
+        new THREE.PlaneGeometry(
+
+            MAP_SIZE,
+
+            MAP_SIZE
+
+        );
+
+
+    const material =
+
+        new THREE.MeshLambertMaterial({
+
+            color:
+                0x228B22
+
+        });
+
+
+    const ground =
+
+        new THREE.Mesh(
+
+            geometry,
+
+            material
+
+        );
+
+
+    ground.rotation.x =
+
+        -Math.PI / 2;
+
+
+    ground.position.y =
+        0;
+
+
+    scene.add(
+
+        ground
+
+    );
+
+}
+
+
+/* =====================================================
+   WALL CREATION
+===================================================== */
+
+function createWall(
+
+    x,
+
+    z,
+
+    width,
+
+    depth,
+
+    height = 4
+
+) {
+
+
+    const geometry =
+
+        new THREE.BoxGeometry(
+
+            width,
+
+            height,
+
+            depth
+
+        );
+
+
+    const material =
+
+        new THREE.MeshLambertMaterial({
+
+            color:
+                0x777777
+
+        });
+
+
+    const wall =
+
+        new THREE.Mesh(
+
+            geometry,
+
+            material
+
+        );
+
+
+    wall.position.set(
+
+        x,
+
+        height / 2,
+
+        z
+
+    );
+
+
+    scene.add(
+
+        wall
+
+    );
+
+
+    walls.push(
+
+        wall
+
+    );
+
+
+    return wall;
+
+}
+
+
+/* =====================================================
+   LARGE 250x250 MAP
+===================================================== */
+
+function createMap() {
+
+
+    /* OUTER WALLS */
+
+    createWall(
+
+        0,
+
+        -124,
+
+        250,
+
+        2,
+
+        8
+
+    );
+
+
+    createWall(
+
+        0,
+
+        124,
+
+        250,
+
+        2,
+
+        8
+
+    );
+
+
+    createWall(
+
+        -124,
+
+        0,
+
+        2,
+
+        250,
+
+        8
+
+    );
+
+
+    createWall(
+
+        124,
+
+        0,
+
+        2,
+
+        250,
+
+        8
+
+    );
+
+
+    /* CENTRAL COVER */
+
+    createWall(
+
+        0,
+
+        0,
+
+        30,
+
+        5,
+
+        6
+
+    );
+
+
+    createWall(
+
+        0,
+
+        0,
+
+        5,
+
+        30,
+
+        6
+
+    );
+
+
+    /* NORTH COVER */
+
+    createWall(
+
+        -50,
+
+        -50,
+
+        35,
+
+        5,
+
+        5
+
+    );
+
+
+    createWall(
+
+        50,
+
+        -50,
+
+        35,
+
+        5,
+
+        5
+
+    );
+
+
+    /* SOUTH COVER */
+
+    createWall(
+
+        -50,
+
+        50,
+
+        35,
+
+        5,
+
+        5
+
+    );
+
+
+    createWall(
+
+        50,
+
+        50,
+
+        35,
+
+        5,
+
+        5
+
+    );
+
+
+    /* SIDE STRUCTURES */
+
+    createWall(
+
+        -80,
+
+        0,
+
+        5,
+
+        40,
+
+        6
+
+    );
+
+
+    createWall(
+
+        80,
+
+        0,
+
+        5,
+
+        40,
+
+        6
+
+    );
+
+
+    /* BACK STRUCTURES */
+
+    createWall(
+
+        0,
+
+        -80,
+
+        50,
+
+        5,
+
+        6
+
+    );
+
+
+    createWall(
+
+        0,
+
+        80,
+
+        50,
+
+        5,
+
+        6
+
+    );
+
+}
+
+
+/* =====================================================
+   PLAYER GUN
+===================================================== */
+
+function createGun() {
+
+
+    gun =
+        new THREE.Group();
+
+
+    gun.position.set(
+
+        0.35,
+
+        -0.3,
+
+        -0.8
+
+    );
+
+
+    camera.add(
+
+        gun
+
+    );
+
+
+    const material =
+
+        new THREE.MeshLambertMaterial({
+
+            color:
+                0x222222
+
+        });
+
+
+    const body =
+
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+
+                0.25,
+
+                0.25,
+
+                0.8
+
+            ),
+
+            material
+
+        );
+
+
+    gun.add(
+
+        body
+
+    );
+
+
+    const barrel =
+
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+
+                0.05,
+
+                0.05,
+
+                0.6,
+
+                12
+
+            ),
+
+            material
+
+        );
+
+
+    barrel.rotation.x =
+
+        Math.PI / 2;
+
+
+    barrel.position.z =
+
+        -0.6;
+
+
+    gun.add(
+
+        barrel
+
+    );
+
+
+    const flashGeometry =
+
+        new THREE.SphereGeometry(
+
+            0.15,
+
+            8,
+
+            8
+
+        );
+
+
+    const flashMaterial =
+
+        new THREE.MeshBasicMaterial({
+
+            color:
+                0xffff00
+
+        });
+
+
+    muzzleFlash =
+
+        new THREE.Mesh(
+
+            flashGeometry,
+
+            flashMaterial
+
+        );
+
+
+    muzzleFlash.position.z =
+
+        -0.9;
+
+
+    muzzleFlash.visible =
+        false;
+
+
+    gun.add(
+
+        muzzleFlash
+
+    );
+
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+function setupControls() {
+
+
+    const joystick =
+
+        document.getElementById(
+
+            "joystick"
+
+        );
+
+
+    const stick =
+
+        document.getElementById(
+
+            "stick"
+
+        );
+
+
+    joystick.addEventListener(
+
+        "touchstart",
+
+        function(e) {
+
+
+            e.preventDefault();
+
+
+            if (
+                joystickTouch !== null
+            )
+                return;
+
+
+            joystickTouch =
+
+                e.changedTouches[0]
+                    .identifier;
+
+        },
+
+        {
+            passive:
+                false
+        }
+
+    );
+
+
+    joystick.addEventListener(
+
+        "touchmove",
+
+        function(e) {
+
+
+            e.preventDefault();
+
+
+            let touch =
+
+                [...e.touches].find(
+
+                    t =>
+
+                    t.identifier ===
+                    joystickTouch
+
+                );
+
+
+            if (
+                !touch
+            )
+                return;
+
+
+            const rect =
+
+                joystick
+                    .getBoundingClientRect();
+
+
+            let x =
+
+                touch.clientX -
+
+                (
+                    rect.left +
+                    rect.width / 2
+                );
+
+
+            let y =
+
+                touch.clientY -
+
+                (
+                    rect.top +
+                    rect.height / 2
+                );
+
+
+            const max = 40;
+
+
+            const distance =
+
+                Math.sqrt(
+
+                    x * x +
+                    y * y
+
+                );
+
+
+            if (
+
+                distance > max
+
+            ) {
+
+
+                x =
+
+                    x /
+                    distance *
+                    max;
+
+
+                y =
+
+                    y /
+                    distance *
+                    max;
+
+            }
+
+
+            joyX =
+
+                x / max;
+
+
+            joyY =
+
+                y / max;
+
+
+            stick.style.transform =
+
+                `translate(${x}px, ${y}px)`;
+
+        },
+
+        {
+            passive:
+                false
+        }
+
+    );
+
+
+    joystick.addEventListener(
+
+        "touchend",
+
+        function(e) {
+
+
+            for (
+
+                let touch of
+                e.changedTouches
+
+            ) {
+
+
+                if (
+
+                    touch.identifier ===
+                    joystickTouch
+
+                ) {
+
+
+                    joystickTouch =
+                        null;
+
+
+                    joyX = 0;
+
+                    joyY = 0;
+
+
+                    stick.style.transform =
+
+                        "translate(0,0)";
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /* =================================================
+       AIM
+    ================================================= */
+
+    renderer.domElement.addEventListener(
+
+        "touchstart",
+
+        function(e) {
+
+
+            for (
+
+                let touch of
+                e.changedTouches
+
+            ) {
+
+
+                if (
+
+                    touch.clientX >
+                    window.innerWidth / 2
+
+                ) {
+
+
+                    if (
+                        aimTouch !== null
+                    )
+                        continue;
+
+
+                    aimTouch =
+
+                        touch.identifier;
+
+
+                    lastAimX =
+
+                        touch.clientX;
+
+
+                    lastAimY =
+
+                        touch.clientY;
+
+                }
+
+            }
+
+        },
+
+        {
+            passive:
+                true
+        }
+
+    );
+
+
+    renderer.domElement.addEventListener(
+
+        "touchmove",
+
+        function(e) {
+
+
+            for (
+
+                let touch of
+                e.changedTouches
+
+            ) {
+
+
+                if (
+
+                    touch.identifier ===
+                    aimTouch
+
+                ) {
+
+
+                    const dx =
+
+                        touch.clientX -
+                        lastAimX;
+
+
+                    const dy =
+
+                        touch.clientY -
+                        lastAimY;
+
+
+                    rotationY -=
+
+                        dx *
+                        0.004;
+
+
+                    rotationX -=
+
+                        dy *
+                        0.004;
+
+
+                    rotationX =
+
+                        Math.max(
+
+                            -1.3,
+
+                            Math.min(
+
+                                1.3,
+
+                                rotationX
+
+                            )
+
+                        );
+
+
+                    player.rotation.y =
+
+                        rotationY;
+
+
+                    camera.rotation.x =
+
+                        rotationX;
+
+
+                    lastAimX =
+
+                        touch.clientX;
+
+
+                    lastAimY =
+
+                        touch.clientY;
+
+                }
+
+            }
+
+        },
+
+        {
+            passive:
+                true
+        }
+
+    );
+
+
+    renderer.domElement.addEventListener(
+
+        "touchend",
+
+        function(e) {
+
+
+            for (
+
+                let touch of
+                e.changedTouches
+
+            ) {
+
+
+                if (
+
+                    touch.identifier ===
+                    aimTouch
+
+                ) {
+
+
+                    aimTouch =
+                        null;
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /* =================================================
+       FIRE
+    ================================================= */
+
+    document
+        .getElementById("fire")
+        .addEventListener(
+
+            "touchstart",
+
+            function(e) {
+
+
+                e.preventDefault();
+
+
+                shoot();
+
+            },
+
+            {
+                passive:
+                    false
+            }
+
+        );
+
+
+    /* =================================================
+       RELOAD
+    ================================================= */
+
+    document
+        .getElementById("reload")
+        .addEventListener(
+
+            "touchstart",
+
+            function(e) {
+
+
+                e.preventDefault();
+
+
+                reload();
+
+            },
+
+            {
+                passive:
+                    false
+            }
+
+        );
+
+
+    /* =================================================
+       SPRINT
+    ================================================= */
+
+    const sprintButton =
+
+        document.getElementById(
+
+            "sprint"
+
+        );
+
+
+    sprintButton.addEventListener(
+
+        "touchstart",
+
+        function(e) {
+
+
+            e.preventDefault();
+
+
+            sprinting = true;
+
+        },
+
+        {
+            passive:
+                false
+        }
+
+    );
+
+
+    sprintButton.addEventListener(
+
+        "touchend",
+
+        function() {
+
+
+            sprinting = false;
+
+        }
+
+    );
+
+
+    /* =================================================
+       RESTART
+    ================================================= */
+
+    document
+        .getElementById("restart")
+        .addEventListener(
+
+            "click",
+
+            function() {
+
+
+                location.reload();
+
+            }
+
+        );
+
+}
+
+
+/* =====================================================
+   WEAPON SETUP
+===================================================== */
+
+function setupWeapons() {
+
+
+    const buttons =
+
+        document.querySelectorAll(
+
+            ".weaponButton"
+
+        );
+
+
+    buttons.forEach(
+
+        button => {
+
+
+            button.addEventListener(
+
+                "touchstart",
+
+                function(e) {
+
+
+                    e.preventDefault();
+
+
+                    switchWeapon(
+
+                        button.dataset.weapon
+
+                    );
+
+                },
+
+                {
+                    passive:
+                        false
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   SWITCH WEAPON
+===================================================== */
+
+function switchWeapon(
+
+    weaponName
+
+) {
+
+
+    if (
+        !weapons[weaponName]
+    )
+        return;
+
+
+    if (
+        reloading
+    )
+        return;
+
+
+    currentWeapon =
+
+        weaponName;
+
+
+    const weapon =
+
+        weapons[
+            currentWeapon
+        ];
+
+
+    document
+        .getElementById(
+            "weaponName"
+        )
+        .textContent =
+
+        weapon.name;
+
+
+    updateHUD();
+
+}
+
+
+/* =====================================================
+   COLLISION
+===================================================== */
+
+function checkCollision(
+
+    position
+
+) {
+
+
+    const playerBox =
+
+        new THREE.Box3();
+
+
+    playerBox.setFromCenterAndSize(
+
+        position,
+
+        new THREE.Vector3(
+
+            0.8,
+
+            2,
+
+            0.8
+
+        )
+
+    );
+
+
+    for (
+
+        let wall of walls
+
+    ) {
+
+
+        const wallBox =
+
+            new THREE.Box3()
+                .setFromObject(
+
+                    wall
+
+                );
+
+
+        if (
+
+            playerBox.intersectsBox(
+
+                wallBox
+
+            )
+
+        ) {
+
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =====================================================
+   PLAYER MOVEMENT
+===================================================== */
+
+function movePlayer(
+
+    delta
+
+) {
+
+
+    if (
+        gameOver
+    )
+        return;
+
+
+    const speed =
+
+        sprinting
+        ? 10
+        : 5;
+
+
+    const forward =
+
+        new THREE.Vector3(
+
+            0,
+            0,
+            -1
+
+        );
+
+
+    const right =
+
+        new THREE.Vector3(
+
+            1,
+            0,
+            0
+
+        );
+
+
+    forward.applyQuaternion(
+
+        player.quaternion
+
+    );
+
+
+    right.applyQuaternion(
+
+        player.quaternion
+
+    );
+
+
+    forward.y = 0;
+
+    right.y = 0;
+
+
+    forward.normalize();
+
+    right.normalize();
+
+
+    const movement =
+
+        new THREE.Vector3();
+
+
+    movement.add(
+
+        forward.multiplyScalar(
+
+            -joyY
+
+        )
+
+    );
+
+
+    movement.add(
+
+        right.multiplyScalar(
+
+            joyX
+
+        )
+
+    );
+
+
+    if (
+
+        movement.length() > 0
+
+    ) {
+
+
+        movement.normalize();
+
+
+        const move =
+
+            movement.multiplyScalar(
+
+                speed *
+                delta
+
+            );
+
+
+        const testX =
+
+            player.position.clone();
+
+
+        testX.x +=
+
+            move.x;
+
+
+        if (
+
+            !checkCollision(
+
+                testX
+
+            )
+
+        ) {
+
+
+            player.position.x =
+
+                testX.x;
+
+        }
+
+
+        const testZ =
+
+            player.position.clone();
+
+
+        testZ.z +=
+
+            move.z;
+
+
+        if (
+
+            !checkCollision(
+
+                testZ
+
+            )
+
+        ) {
+
+
+            player.position.z =
+
+                testZ.z;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   WAVE SYSTEM FOUNDATION
+===================================================== */
+
+function startWave(
+
+    wave
+
+) {
+
+
+    currentWave =
+        wave;
+
+
+    waveInProgress =
+        true;
+
+
+    enemiesSpawned =
+        0;
+
+
+    enemiesToSpawn =
+
+        5 +
+
+        (
+            wave *
+            2
+        );
+
+
+    waveEnemiesRemaining =
+
+        enemiesToSpawn;
+
+
+    spawnTimer =
+        0;
+
+
+    updateWaveHUD();
+
+
+    showWaveMessage(
+
+        "WAVE " +
+        wave
+
+    );
+
+}
+
+
+/* =====================================================
+   WAVE HUD
+===================================================== */
+
+function updateWaveHUD() {
+
+
+    document
+        .getElementById(
+            "wave"
+        )
+        .textContent =
+
+        currentWave;
+
+
+    document
+        .getElementById(
+            "maxWave"
+        )
+        .textContent =
+
+        totalWaves;
+
+}
+
+
+/* =====================================================
+   WAVE MESSAGE
+===================================================== */
+
+function showWaveMessage(
+
+    text
+
+) {
+
+
+    const element =
+
+        document.getElementById(
+
+            "waveMessage"
+
+        );
+
+
+    element.textContent =
+        text;
+
+
+    element.style.opacity =
+        1;
+
+
+    setTimeout(
+
+        function() {
+
+
+            element.style.opacity =
+                0;
+
+
+        },
+
+        2000
+
+    );
+
+}
+
+
+/* =====================================================
+   WAVE SYSTEM
+===================================================== */
+
+function updateWaveSystem(
+
+    delta
+
+) {
+
+
+    if (
+        gameOver
+    )
+        return;
+
+
+    if (
+
+        waveInProgress &&
+
+        enemiesSpawned <
+        enemiesToSpawn
+
+    ) {
+
+
+        spawnTimer -=
+            delta;
+
+
+        if (
+
+            spawnTimer <=
+            0
+
+        ) {
+
+
+            spawnWaveEnemy();
+
+
+            spawnTimer =
+
+                Math.max(
+
+                    0.4,
+
+                    1.5 -
+
+                    currentWave *
+                    0.05
+
+                );
+
+        }
+
+    }
+
+
+    if (
+
+        waveInProgress &&
+
+        enemiesSpawned >=
+        enemiesToSpawn
+
+    ) {
+
+
+        const aliveEnemies =
+
+            enemies.filter(
+
+                enemy =>
+
+                    enemy.alive
+
+            ).length;
+
+
+        if (
+
+            aliveEnemies === 0
+
+        ) {
+
+
+            waveInProgress =
+                false;
+
+
+            if (
+
+                currentWave >=
+                totalWaves
+
+            ) {
+
+
+                winGame();
+
+
+                return;
+
+            }
+
+
+            waveMessageTimer =
+                waveDelay;
+
+
+            showWaveMessage(
+
+                "WAVE " +
+                currentWave +
+                " COMPLETE"
+
+            );
+
+        }
+
+    }
+
+
+    if (
+
+        !waveInProgress &&
+
+        currentWave <
+        totalWaves
+
+    ) {
+
+
+        waveMessageTimer -=
+            delta;
+
+
+        if (
+
+            waveMessageTimer <=
+            0
+
+        ) {
+
+
+            startWave(
+
+                currentWave +
+                1
+
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SPAWN WAVE ENEMY
+===================================================== */
+
+function spawnWaveEnemy() {
+
+
+    if (
+
+        enemiesSpawned >=
+        enemiesToSpawn
+
+    )
+        return;
+
+
+    const spawnPoint =
+
+        findSafeSpawnPoint();
+
+
+    console.log(
+
+        "Enemy spawn:",
+
+        spawnPoint.x,
+
+        spawnPoint.z
+
+    );
+
+
+    enemiesSpawned++;
+
+}
+
+
+/* =====================================================
+   SAFE SPAWN POINT
+===================================================== */
+
+function findSafeSpawnPoint() {
+
+
+    const MIN_DISTANCE =
+        40;
+
+
+    const MAX_DISTANCE =
+        115;
+
+
+    for (
+
+        let attempt = 0;
+
+        attempt < 100;
+
+        attempt++
+
+    ) {
+
+
+        const angle =
+
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const distance =
+
+            MIN_DISTANCE +
+
+            Math.random() *
+
+            (
+                MAX_DISTANCE -
+                MIN_DISTANCE
+            );
+
+
+        const x =
+
+            player.position.x +
+
+            Math.cos(
+                angle
+            ) *
+            distance;
+
+
+        const z =
+
+            player.position.z +
+
+            Math.sin(
+                angle
+            ) *
+            distance;
+
+
+        if (
+
+            x < -115 ||
+
+            x > 115 ||
+
+            z < -115 ||
+
+            z > 115
+
+        ) {
+
+
+            continue;
+
+        }
+
+
+        const position =
+
+            new THREE.Vector3(
+
+                x,
+
+                0,
+
+                z
+
+            );
+
+
+        if (
+
+            checkCollision(
+
+                position
+
+            )
+
+        ) {
+
+
+            continue;
+
+        }
+
+
+        let tooClose =
+            false;
+
+
+        for (
+
+            let enemy of
+            enemies
+
+        ) {
+
+
+            if (
+                !enemy.alive
+            )
+                continue;
+
+
+            if (
+
+                enemy.position.distanceTo(
+
+                    position
+
+                ) < 15
+
+            ) {
+
+
+                tooClose =
+                    true;
+
+
+                break;
+
+            }
+
+        }
+
+
+        if (
+            tooClose
+        )
+            continue;
+
+
+        return position;
+
+    }
+
+
+    return new THREE.Vector3(
+
+        100,
+
+        0,
+
+        100
+
+    );
+
+}
+
+
+/* =====================================================
+   SHOOT FOUNDATION
+===================================================== */
+
+function shoot() {
+
+
+    if (
+        gameOver ||
+        reloading
+    )
+        return;
+
+
+    const weapon =
+
+        weapons[
+            currentWeapon
+        ];
+
+
+    const now =
+
+        performance.now();
+
+
+    if (
+
+        now -
+        lastShot <
+
+        weapon.fireRate
+
+    )
+        return;
+
+
+    if (
+
+        weapon.ammo <= 0
+
+    ) {
+
+
+        reload();
+
+
+        return;
+
+    }
+
+
+    lastShot =
+        now;
+
+
+    weapon.ammo--;
+
+
+    updateHUD();
+
+
+    muzzleFlash.visible =
+        true;
+
+
+    setTimeout(
+
+        function() {
+
+
+            muzzleFlash.visible =
+                false;
+
+
+        },
+
+        60
+
+    );
+
+}
+
+
+/* =====================================================
+   RELOAD
+===================================================== */
+
+function reload() {
+
+
+    const weapon =
+
+        weapons[
+            currentWeapon
+        ];
+
+
+    if (
+
+        reloading ||
+
+        weapon.ammo >=
+        weapon.magazine ||
+
+        weapon.reserve <= 0
+
+    )
+        return;
+
+
+    reloading =
+        true;
+
+
+    document
+        .getElementById(
+            "reload"
+        )
+        .textContent =
+
+        "RELOADING";
+
+
+    setTimeout(
+
+        function() {
+
+
+            const needed =
+
+                weapon.magazine -
+                weapon.ammo;
+
+
+            const amount =
+
+                Math.min(
+
+                    needed,
+
+                    weapon.reserve
+
+                );
+
+
+            weapon.ammo +=
+                amount;
+
+
+            weapon.reserve -=
+                amount;
+
+
+            reloading =
+                false;
+
+
+            document
+                .getElementById(
+                    "reload"
+                )
+                .textContent =
+
+                "RELOAD";
+
+
+            updateHUD();
+
+
+        },
+
+        weapon.reloadTime
+
+    );
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+function updateHUD() {
+
+
+    const weapon =
+
+        weapons[
+            currentWeapon
+        ];
+
+
+    document
+        .getElementById(
+            "ammo"
+        )
+        .textContent =
+
+        weapon.ammo;
+
+
+    document
+        .getElementById(
+            "reserve"
+        )
+        .textContent =
+
+        weapon.reserve;
+
+
+    document
+        .getElementById(
+            "kills"
+        )
+        .textContent =
+
+        kills;
+
+
+    document
+        .getElementById(
+            "enemyCount"
+        )
+        .textContent =
+
+        enemies.filter(
+
+            enemy =>
+
+                enemy.alive
+
+        ).length;
+
+
+    document
+        .getElementById(
+            "health"
+        )
+        .style.width =
+
+        health +
+        "%";
+
+}
+
+
+/* =====================================================
+   MINIMAP
+===================================================== */
+
+function updateMinimap() {
+
+
+    const canvas =
+
+        document.getElementById(
+
+            "minimap"
+
+        );
+
+
+    const ctx =
+
+        canvas.getContext(
+
+            "2d"
+
+        );
+
+
+    ctx.clearRect(
+
+        0,
+
+        0,
+
+        150,
+
+        150
+
+    );
+
+
+    ctx.fillStyle =
+        "#333";
+
+
+    ctx.fillRect(
+
+        0,
+
+        0,
+
+        150,
+
+        150
+
+    );
+
+
+    ctx.strokeStyle =
+        "#555";
+
+
+    for (
+
+        let i = 0;
+
+        i <= 150;
+
+        i += 25
+
+    ) {
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+
+            i,
+
+            0
+
+        );
+
+
+        ctx.lineTo(
+
+            i,
+
+            150
+
+        );
+
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+
+            0,
+
+            i
+
+        );
+
+
+        ctx.lineTo(
+
+            150,
+
+            i
+
+        );
+
+
+        ctx.stroke();
+
+    }
+
+
+    /* ENEMIES */
+
+    for (
+
+        let enemy of
+        enemies
+
+    ) {
+
+
+        if (
+            !enemy.alive
+        )
+            continue;
+
+
+        const x =
+
+            75 +
+
+            (
+                enemy.position.x /
+                MAP_HALF
+            ) *
+            75;
+
+
+        const y =
+
+            75 +
+
+            (
+                enemy.position.z /
+                MAP_HALF
+            ) *
+            75;
+
+
+        ctx.fillStyle =
+            "red";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+
+            x,
+
+            y,
+
+            4,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    /* PLAYER */
+
+    const playerX =
+
+        75 +
+
+        (
+            player.position.x /
+            MAP_HALF
+        ) *
+        75;
+
+
+    const playerY =
+
+        75 +
+
+        (
+            player.position.z /
+            MAP_HALF
+        ) *
+        75;
+
+
+    ctx.fillStyle =
+        "lime";
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+
+        playerX,
+
+        playerY,
+
+        5,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+
+    ctx.fill();
+
+}
+
+
+/* =====================================================
+   WIN
+===================================================== */
+
+function winGame() {
+
+
+    gameOver =
+        true;
+
+
+    document
+        .getElementById(
+            "messageText"
+        )
+        .textContent =
+
+        "YOU WIN!";
+
+
+    document
+        .getElementById(
+            "message"
+        )
+        .style.display =
+
+        "block";
+
+}
+
+
+/* =====================================================
+   LOSE
+===================================================== */
+
+function loseGame() {
+
+
+    gameOver =
+        true;
+
+
+    document
+        .getElementById(
+            "messageText"
+        )
+        .textContent =
+
+        "GAME OVER";
+
+
+    document
+        .getElementById(
+            "message"
+        )
+        .style.display =
+
+        "block";
+
+}
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+function resize() {
+
+
+    camera.aspect =
+
+        window.innerWidth /
+        window.innerHeight;
+
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(
+
+        window.innerWidth,
+
+        window.innerHeight
+
+    );
+
+}
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+let lastTime =
+
+    performance.now();
+
+
+function animate() {
+
+
+    requestAnimationFrame(
+
+        animate
+
+    );
+
+
+    const now =
+
+        performance.now();
+
+
+    let delta =
+
+        (
+            now -
+            lastTime
+
+        ) / 1000;
+
+
+    lastTime =
+        now;
+
+
+    delta =
+
+        Math.min(
+
+            delta,
+
+            0.1
+
+        );
+
+
+    movePlayer(
+
+        delta
+
+    );
+
+
+    updateWaveSystem(
+
+        delta
+
+    );
+
+
+    updateMinimap();
+
+
+    renderer.render(
+
+        scene,
+
+        camera
+
+    );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+startGame();
+
+</script>
+
+</body>
+
+</html>
